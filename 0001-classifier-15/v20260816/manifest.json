@@ -1,0 +1,142 @@
+{
+    "author": "kleamp1e",
+    "model": "classifier-15",
+    "version": "20260816",
+    "preprocessor": {
+        "onnx_file": {
+            "name": "kleamp1e-classifier-15-preprocessor-v20260816.onnx",
+            "size": 2479,
+            "sha256": "e3622091af51f85e54fe36b924ba906e982795784ca2be98b59a1fe956ddec9e",
+            "url": "https://github.com/kleamp1e/model-zoo/releases/download/classifier-15-v20260816-rc1/kleamp1e-classifier-15-preprocessor-v20260816.onnx"
+        },
+        "inputs": [
+            {
+                "name": "rgb_image",
+                "type": "uint8",
+                "shape": [
+                    1,
+                    "height",
+                    "width",
+                    3
+                ],
+                "description": "A single RGB image in NHWC layout with values in [0, 255]. Batching is not supported: the leading dimension is fixed to 1, so images must be preprocessed one at a time."
+            }
+        ],
+        "outputs": [
+            {
+                "name": "images",
+                "type": "float32",
+                "shape": [
+                    1,
+                    3,
+                    380,
+                    380
+                ],
+                "description": "The preprocessed image in NCHW layout, ready to be fed to the classifier. Because this model does not support batching, concatenate the outputs of multiple runs along the first axis to build a batch for the classifier."
+            }
+        ]
+    },
+    "classifier": {
+        "onnx_file": {
+            "name": "kleamp1e-classifier-15-v20260816.onnx",
+            "size": 70201411,
+            "sha256": "9a361cdb47498c0aee733388adcc0cc1bedc665ef6215508b9395d50dee57ee4",
+            "url": "https://github.com/kleamp1e/model-zoo/releases/download/classifier-15-v20260816-rc1/kleamp1e-classifier-15-v20260816.onnx"
+        },
+        "inputs": [
+            {
+                "name": "images",
+                "type": "float32",
+                "shape": [
+                    "batch",
+                    3,
+                    380,
+                    380
+                ],
+                "description": "Preprocessed images in NCHW layout, as produced by the preprocessor model. Unlike the preprocessor, this model accepts an arbitrary batch size."
+            }
+        ],
+        "outputs": [
+            {
+                "name": "probabilities",
+                "type": "float32",
+                "shape": [
+                    "batch",
+                    15
+                ],
+                "description": "Per-label probabilities in [0, 1], in the same order as `labels`. This is a multi-label classifier: the scores are produced by a sigmoid, so each label is independent, the values do not sum to 1, and any number of labels may be positive at once. Apply the per-label `recommended_threshold` rather than taking the argmax.",
+                "labels": [
+                    {
+                        "name": "blowjob",
+                        "recommended_threshold": 0.931640625
+                    },
+                    {
+                        "name": "censored",
+                        "recommended_threshold": 0.63427734375
+                    },
+                    {
+                        "name": "composite",
+                        "recommended_threshold": 0.3984375
+                    },
+                    {
+                        "name": "cosplay",
+                        "recommended_threshold": 0.65234375
+                    },
+                    {
+                        "name": "handjob",
+                        "recommended_threshold": 0.9208984375
+                    },
+                    {
+                        "name": "human",
+                        "recommended_threshold": 0.038116455078125
+                    },
+                    {
+                        "name": "masturbation",
+                        "recommended_threshold": 0.939453125
+                    },
+                    {
+                        "name": "nipple",
+                        "recommended_threshold": 0.67041015625
+                    },
+                    {
+                        "name": "photo",
+                        "recommended_threshold": 0.34228515625
+                    },
+                    {
+                        "name": "pornography",
+                        "recommended_threshold": 0.220458984375
+                    },
+                    {
+                        "name": "sex",
+                        "recommended_threshold": 0.32373046875
+                    },
+                    {
+                        "name": "sm",
+                        "recommended_threshold": 0.7861328125
+                    },
+                    {
+                        "name": "sperm",
+                        "recommended_threshold": 0.91259765625
+                    },
+                    {
+                        "name": "swimwear",
+                        "recommended_threshold": 0.88427734375
+                    },
+                    {
+                        "name": "underwear",
+                        "recommended_threshold": 0.52734375
+                    }
+                ]
+            },
+            {
+                "name": "embeddings",
+                "type": "float32",
+                "shape": [
+                    "batch",
+                    1792
+                ],
+                "description": "Feature vectors taken from the global average pooling layer. They are already L2-normalized (unit length), so cosine similarity can be computed as a plain dot product without normalizing again."
+            }
+        ]
+    }
+}
