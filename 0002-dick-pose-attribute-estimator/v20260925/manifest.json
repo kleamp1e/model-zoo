@@ -1,0 +1,132 @@
+{
+  "author": "kleamp1e",
+  "model": "dick-pose-attribute-estimator",
+  "version": "20260925",
+  "pose": {
+    "onnx_file": {
+      "name": "kleamp1e-dick-pose-v20260925.onnx",
+      "size": 10142718,
+      "sha256": "c9ddc3e5bf039770fdb634a985cb624dd8a5f3c163c51e1ef2a2dcd07628d4a7",
+      "url": "https://github.com/kleamp1e/model-zoo/releases/download/dick-pose-attribute-estimator-v20260925-rc1/kleamp1e-dick-pose-v20260925.onnx"
+    },
+    "architecture": "YOLO26n-pose",
+    "inputs": [
+      {
+        "name": "images",
+        "type": "float32",
+        "shape": [
+          1,
+          3,
+          640,
+          640
+        ],
+        "description": "RGB image after centered letterbox padding and scaling to [0, 1]."
+      }
+    ],
+    "outputs": [
+      {
+        "name": "output0",
+        "type": "float32",
+        "shape": [
+          1,
+          9,
+          8400
+        ],
+        "description": "8400 candidates: center x/y, width/height, dick confidence, and two x/y keypoints. Apply confidence filtering and NMS (IoU 0.7), then transform coordinates to the source image."
+      }
+    ]
+  },
+  "preprocessor": {
+    "onnx_file": {
+      "name": "kleamp1e-dick-attribute-preprocessor-v20260925.onnx",
+      "size": 13334,
+      "sha256": "760e2efc6a092e5be59d464322bf1bd45013f775efac1fb64eec5f007b033982",
+      "url": "https://github.com/kleamp1e/model-zoo/releases/download/dick-pose-attribute-estimator-v20260925-rc1/kleamp1e-dick-attribute-preprocessor-v20260925.onnx"
+    },
+    "inputs": [
+      {
+        "name": "image",
+        "type": "uint8",
+        "shape": [
+          "height",
+          "width",
+          3
+        ],
+        "description": "Decoded source RGB image."
+      },
+      {
+        "name": "boxes",
+        "type": "float32",
+        "shape": [
+          "detections",
+          4
+        ],
+        "description": "Source-image x1/y1/x2/y2 boxes."
+      },
+      {
+        "name": "points",
+        "type": "float32",
+        "shape": [
+          "detections",
+          2,
+          2
+        ],
+        "description": "Source-image x/y pose keypoints."
+      }
+    ],
+    "outputs": [
+      {
+        "name": "crops",
+        "type": "float32",
+        "shape": [
+          "detections",
+          3,
+          224,
+          224
+        ],
+        "description": "Pose-aligned crops with ImageNet normalization for the classifier."
+      }
+    ]
+  },
+  "classifier": {
+    "onnx_file": {
+      "name": "kleamp1e-dick-attribute-classifier-v20260925.onnx",
+      "size": 16056594,
+      "sha256": "206489c2f018a18a24a032833f801c811275760b3b9bb6007d0225e9f5bb8767",
+      "url": "https://github.com/kleamp1e/model-zoo/releases/download/dick-pose-attribute-estimator-v20260925-rc1/kleamp1e-dick-attribute-classifier-v20260925.onnx"
+    },
+    "architecture": "EfficientNet-B0",
+    "inputs": [
+      {
+        "name": "image",
+        "type": "float32",
+        "shape": [
+          "batch",
+          3,
+          224,
+          224
+        ],
+        "description": "Crops from the preprocessor output."
+      }
+    ],
+    "outputs": [
+      {
+        "name": "probabilities",
+        "type": "float32",
+        "shape": [
+          "batch",
+          6
+        ],
+        "labels": [
+          "sex",
+          "blowjob",
+          "handjob",
+          "boobjob",
+          "ejaculation",
+          "condom"
+        ],
+        "description": "Independent sigmoid probabilities in label order; values do not sum to one."
+      }
+    ]
+  }
+}
